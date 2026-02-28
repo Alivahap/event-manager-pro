@@ -1,0 +1,532 @@
+/* =========================================================
+   Event Manager Pro - Frontend Styles (Archive + Single)
+   ========================================================= */
+
+/* ---------------------------
+   Layout + Typography
+--------------------------- */
+.emp-wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:28px 18px;
+}
+
+.emp-archive-header{
+  margin-bottom:16px;
+}
+
+.emp-title{
+  margin:0 0 10px 0;
+  line-height:1.15;
+  font-size:34px;
+  letter-spacing:-0.02em;
+}
+
+.emp-subtitle{
+  margin:0;
+  opacity:.78;
+  font-size:15px;
+}
+
+/* Optional: Hero header look (GloriaThemes-style vibe)
+   Use by adding class: <header class="emp-archive-header emp-hero"> ... */
+.emp-hero{
+  border-radius:22px;
+  padding:26px 18px;
+  background:
+    radial-gradient(1200px 400px at 10% 10%, rgba(0,0,0,.10), transparent 60%),
+    radial-gradient(900px 380px at 90% 0%, rgba(0,0,0,.10), transparent 55%),
+    linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.02));
+  border:1px solid rgba(0,0,0,.08);
+  box-shadow:0 18px 40px rgba(0,0,0,.08);
+}
+
+.emp-hero .emp-title{
+  margin-bottom:8px;
+}
+
+.emp-hero .emp-subtitle{
+  opacity:.80;
+}
+
+/* ---------------------------
+   Filter Panel
+--------------------------- */
+.emp-filters{
+  margin:18px 0 22px;
+  padding:14px;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:16px;
+  background:rgba(255,255,255,.90);
+  box-shadow: 0 12px 26px rgba(0,0,0,.07);
+  backdrop-filter: blur(8px);
+}
+
+.emp-filter-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:12px;
+  align-items:end;
+}
+
+.emp-filters label{
+  font-size:12px;
+  opacity:.9;
+}
+
+.emp-filters select,
+.emp-filters input{
+  width:100%;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.12);
+  background:#fff;
+  outline:none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+
+.emp-filters select:focus,
+.emp-filters input:focus{
+  border-color: rgba(0,0,0,.28);
+  box-shadow: 0 0 0 4px rgba(0,0,0,.06);
+}
+
+/* ---------------------------
+   Grid
+--------------------------- */
+.emp-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:16px;
+}
+
+/* ---------------------------
+   Card (Base)
+--------------------------- */
+.emp-card{
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:18px;
+  background:#fff;
+  box-shadow: 0 10px 24px rgba(0,0,0,.06);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  overflow:hidden;
+}
+
+.emp-card:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.10);
+  border-color: rgba(0,0,0,.14);
+}
+
+/* If your markup is old (no media wrapper), still looks fine */
+.emp-card{
+  padding:16px;
+}
+
+/* If you switch to "media + body" markup, prefer these:
+   <a class="emp-card-media">...</a>
+   <div class="emp-card-body">...</div> */
+.emp-card-media{
+  position:relative;
+  display:block;
+  width:100%;
+  aspect-ratio: 16 / 9;
+  background: rgba(0,0,0,.06);
+  overflow:hidden;
+  border-radius:14px;
+  margin-bottom:12px;
+}
+
+.emp-card-media img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  transform:scale(1.01);
+  transition: transform .25s ease;
+}
+
+.emp-card:hover .emp-card-media img{
+  transform:scale(1.06);
+}
+
+.emp-card-media--placeholder{
+  display:block;
+  width:100%;
+  height:100%;
+  background: linear-gradient(135deg, rgba(0,0,0,.08), rgba(0,0,0,.02));
+}
+
+.emp-card-body{
+  padding:0;
+}
+
+.emp-date-badge{
+  position:absolute;
+  left:14px;
+  bottom:14px;
+  display:inline-flex;
+  align-items:center;
+  padding:8px 10px;
+  border-radius:999px;
+  background:rgba(17,17,17,.92);
+  color:#fff;
+  font-size:12px;
+  letter-spacing:.02em;
+  box-shadow:0 10px 22px rgba(0,0,0,.25);
+}
+
+/* ---------------------------
+   Card Title
+--------------------------- */
+.emp-card-title{
+  margin:10px 0 8px 0;
+  font-size:18px;
+  line-height:1.25;
+  letter-spacing:-0.01em;
+}
+
+.emp-card-title a{
+  text-decoration:none;
+  color:inherit;
+}
+
+.emp-card-title a:hover{
+  text-decoration:underline;
+}
+
+/* ---------------------------
+   Thumbnail (legacy markup)
+--------------------------- */
+.emp-thumb{
+  display:block;
+  width:100%;
+  aspect-ratio: 16 / 9;
+  border-radius:14px;
+  overflow:hidden;
+  background: rgba(0,0,0,.06);
+  margin-bottom:12px;
+}
+
+.emp-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* ---------------------------
+   Meta Pills
+--------------------------- */
+.emp-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0 12px;
+}
+
+.emp-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(0,0,0,.10);
+  background: rgba(0,0,0,.02);
+  font-size:12px;
+  line-height:1;
+  opacity:.95;
+}
+
+.emp-pill--type{
+  background: rgba(0,0,0,.06);
+  border-color: rgba(0,0,0,.08);
+}
+
+/* ---------------------------
+   Excerpt
+   - PHP: wp_trim_words ile 150 kelime sınırı
+   - CSS: kartlar eşit dursun diye clamp
+--------------------------- */
+.emp-excerpt{
+  opacity:.88;
+  margin:0 0 14px;
+  font-size:14px;
+  line-height:1.6;
+
+  /* clamp (modern browsers) */
+  display:-webkit-box;
+  -webkit-line-clamp:5;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* ---------------------------
+   Buttons
+--------------------------- */
+.emp-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.12);
+  text-decoration:none;
+  background:#fff;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+  font-size:14px;
+}
+
+.emp-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0,0,0,.08);
+  border-color: rgba(0,0,0,.20);
+}
+
+.emp-btn:focus{
+  outline:none;
+  box-shadow: 0 0 0 4px rgba(0,0,0,.06);
+}
+
+.emp-btn--primary{
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+
+.emp-btn--primary:hover{
+  background:#000;
+}
+
+/* ---------------------------
+   Pagination
+--------------------------- */
+.emp-pagination{
+  margin-top:22px;
+}
+
+.emp-pagination .page-numbers{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:40px;
+  height:40px;
+  padding:0 12px;
+  margin:0 6px 8px 0;
+  border-radius:999px;
+  border:1px solid rgba(0,0,0,.10);
+  text-decoration:none;
+  background:#fff;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+
+.emp-pagination .page-numbers:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0,0,0,.08);
+  border-color: rgba(0,0,0,.18);
+}
+
+.emp-pagination .page-numbers.current{
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+
+.emp-pagination .page-numbers.dots{
+  border-color: transparent;
+  background: transparent;
+  box-shadow:none;
+}
+
+/* ---------------------------
+   RSVP Panel (existing classes)
+--------------------------- */
+.emp-rsvp{
+  margin-top:18px;
+  padding:16px;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:16px;
+  background:#fff;
+  box-shadow: 0 10px 24px rgba(0,0,0,.06);
+}
+
+.emp-rsvp-title{
+  margin:0 0 10px 0;
+}
+
+.emp-rsvp-form input{
+  width:100%;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.12);
+}
+
+.emp-rsvp-msg{
+  margin-top:10px;
+}
+
+/* ---------------------------
+   Responsive
+--------------------------- */
+@media (max-width: 480px){
+  .emp-title{font-size:28px}
+  .emp-wrap{padding:22px 14px}
+  .emp-filter-row{grid-template-columns:1fr}
+}
+
+/* =========================================================
+   Filters (Pro)
+   ========================================================= */
+
+.emp-filters--pro{
+  border-radius:20px;
+  padding:16px;
+  border:1px solid rgba(0,0,0,.08);
+  background:
+    radial-gradient(900px 220px at 10% 0%, rgba(0,0,0,.08), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.86));
+  box-shadow:0 18px 40px rgba(0,0,0,.10);
+  backdrop-filter: blur(10px);
+}
+
+.emp-filters-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  padding:4px 2px 14px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  margin-bottom:14px;
+}
+
+.emp-filters-title strong{
+  display:block;
+  font-size:14px;
+  letter-spacing:-0.01em;
+}
+
+.emp-filters-title span{
+  display:block;
+  margin-top:2px;
+  font-size:12px;
+  opacity:.75;
+}
+
+.emp-filters-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* grid layout */
+.emp-filter-grid{
+  display:grid;
+  grid-template-columns:
+      1.2fr
+      1fr
+      1fr
+      2fr
+      auto;
+  gap:12px;
+  align-items:end;
+}
+.emp-field-actions{
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+}
+
+.emp-btn--filter{
+  height:44px;
+  padding:0 18px;
+  border-radius:14px;
+  white-space:nowrap;
+}
+.emp-field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.emp-field--wide{
+  grid-column: span 1;
+}
+
+.emp-label{
+  font-size:12px;
+  opacity:.9;
+}
+
+/* unified controls */
+.emp-control{
+  width:100%;
+  height:44px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,.12);
+  background:rgba(255,255,255,.98);
+  outline:none;
+  transition: box-shadow .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.emp-control:focus{
+  border-color: rgba(0,0,0,.28);
+  box-shadow: 0 0 0 4px rgba(0,0,0,.06);
+}
+
+/* nicer select arrow spacing (no custom arrow to avoid conflicts) */
+.emp-control[type="search"]{
+  padding-left:12px;
+}
+
+/* buttons (filter area) */
+.emp-btn--filter{
+  height:44px;
+  padding:0 14px;
+  border-radius:14px;
+  white-space:nowrap;
+}
+
+.emp-btn--ghost{
+  background:rgba(255,255,255,.65);
+  border:1px solid rgba(0,0,0,.10);
+}
+
+.emp-btn--ghost:hover{
+  background:#fff;
+}
+
+/* Responsive: tablet */
+@media (max-width: 900px){
+  .emp-filter-grid{
+    grid-template-columns: 1fr 1fr;
+  }
+  .emp-field--wide{
+    grid-column: 1 / -1;
+  }
+  .emp-filters-head{
+    align-items:flex-start;
+  }
+}
+
+/* Responsive: mobile */
+@media (max-width: 480px){
+  .emp-filters-head{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .emp-filters-actions{
+    width:100%;
+  }
+  .emp-btn--filter{
+    flex:1;
+    justify-content:center;
+  }
+  .emp-filter-grid{
+    grid-template-columns: 1fr;
+  }
+  .emp-field--wide{
+    grid-column:auto;
+  }
+}
