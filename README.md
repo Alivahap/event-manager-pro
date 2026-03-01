@@ -33,7 +33,7 @@ notifications, caching, and internationalization support.
 Custom endpoints:
 POST /wp-json/event-manager-pro/v1/events/{id}/register
 GET /wp-json/event-manager-pro/v1/events/{id}/registrations/count
-
+GET /wp-json/wp/v2/event
 
 ### Notifications
 - Email notification on publish/update
@@ -122,6 +122,70 @@ Input sanitization
 Capability checks
 
 REST validation
+
+## Folder Structure
+
+event-manager-pro/
+│
+├── event-manager-pro.php
+│
+├── assets/
+│   ├── css/
+│   │   └── frontend.css
+│   └── js/
+│       ├── filters.js
+│       └── rsvp.js
+│
+├── templates/
+│   ├── archive-event.php
+│   └── single-event.php
+│
+├── languages/
+│   ├── event-manager-pro.pot
+│   ├── event-manager-pro-tr_TR.po
+│   └── event-manager-pro-tr_TR.mo
+│
+├── includes/
+│   │
+│   ├── post-types/
+│   │   └── class-emp-post-type-event.php
+│   │
+│   ├── taxonomies/
+│   │   └── class-emp-taxonomy-event-type.php
+│   │
+│   ├── admin/
+│   │   ├── class-emp-admin-meta-boxes.php
+│   │   └── class-emp-admin-columns.php
+│   │
+│   ├── frontend/
+│   │   ├── class-emp-template-loader.php
+│   │   └── class-emp-shortcodes.php
+│   │
+│   ├── rest/
+│   │   ├── class-emp-rest-meta.php
+│   │   └── class-emp-rest-rsvp.php
+│   │
+│   ├── rsvp/
+│   │   └── class-emp-rsvp.php
+│   │
+│   ├── notifications/
+│   │   └── class-emp-notifications.php
+│   │
+│   ├── cli/
+│   │   └── class-emp-cli.php
+│   │
+│   ├── class-emp-cache.php
+│   └── class-emp-cache-invalidator.php
+│
+├── tests/
+│   ├── bootstrap.php
+│   ├── test-event-cpt.php
+│   ├── test-event-meta.php
+│   └── test-registration-rest.php
+│
+├── phpunit.xml.dist
+└── README.md
+
 ## Author
 
 Ali Vahap Aydın
