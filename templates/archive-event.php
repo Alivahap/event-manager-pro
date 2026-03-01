@@ -1,273 +1,217 @@
 <?php
-if ( ! defined('ABSPATH') ) { exit; }
+defined( 'ABSPATH' ) || exit;
+
 get_header();
 
+$selected_type = isset( $_GET['event_type'] ) ? sanitize_text_field( wp_unslash( $_GET['event_type'] ) ) : '';
+$from          = isset( $_GET['from'] ) ? sanitize_text_field( wp_unslash( $_GET['from'] ) ) : '';
+$to            = isset( $_GET['to'] ) ? sanitize_text_field( wp_unslash( $_GET['to'] ) ) : '';
+$search = isset( $_GET['emp_s'] ) ? sanitize_text_field( wp_unslash( $_GET['emp_s'] ) ) : '';
 
+if ( $from && ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $from ) ) $from = '';
+if ( $to   && ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $to ) )   $to   = '';
 
+$paged = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : max( 1, get_query_var( 'paged' ) );
 
-$selected_type = isset($_GET['event_type']) ? sanitize_text_field(wp_unslash($_GET['event_type'])) : '';
-$from          = isset($_GET['from']) ? sanitize_text_field(wp_unslash($_GET['from'])) : '';
-$to            = isset($_GET['to']) ? sanitize_text_field(wp_unslash($_GET['to'])) : '';
-$search        = isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : '';
+$cache_key   = EMP_Cache::key( 'archive', [ 'locale' => determine_locale(), 'type' => $selected_type, 'from' => $from, 'to' => $to, 's' => $search, 'paged' => $paged ] );
+$cached_html = EMP_Cache::get( $cache_key );
 
-// Basic date validate (YYYY-MM-DD)
-if ($from !== '' && ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) $from = '';
-if ($to   !== '' && ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $to))   $to   = '';
-
-$paged = isset($_GET['paged'])
-    ? max(1, intval($_GET['paged']))
-    : max(1, get_query_var('paged'));
-
-
-
-    $cache_key = EMP_Cache::key('archive', [
-      'locale' => determine_locale(), // or get_locale()
-      'type'   => $selected_type,
-      'from'   => $from,
-      'to'     => $to,
-      's'      => $search,
-      'paged'  => $paged,
-  ]);
-
-$cached_html = EMP_Cache::get($cache_key);
-// cache control 
-if ($cached_html !== false) {
-    echo '<!-- CACHE HIT -->';
-    echo $cached_html;
-    get_footer();
-	
-    return;
+if ( false !== $cached_html ) {
+	echo $cached_html;
+	get_footer();
+	return;
 }
-
-echo '<!-- CACHE MISS -->';
 
 ob_start();
 
-
-$meta_query = [];
-if ($from !== '' || $to !== '') {
-    $range = ['key' => '_emp_event_date', 'compare' => 'BETWEEN', 'type' => 'CHAR', 'value' => ['', '']];
-    if ($from === '') $from = '0000-00-00';
-    if ($to   === '') $to   = '9999-12-31';
-    $range['value'] = [$from, $to];
-    $meta_query[] = $range;
-}
-
-$tax_query = [];
-if ($selected_type !== '') {
-    $tax_query[] = [
-        'taxonomy' => 'event_type',
-        'field'    => 'slug',
-        'terms'    => [$selected_type],
-    ];
-}
-
-$args = [
-    'post_type'      => 'event',
-    'post_status'    => 'publish',
-    'posts_per_page' => 10,
-    'paged'          => $paged,
-    'meta_key'       => '_emp_event_date',
-    'orderby'        => 'meta_value',
-    'order'          => 'ASC',
+$query_args = [
+	'post_type'      => 'event',
+	'post_status'    => 'publish',
+	'posts_per_page' => 10,
+	'paged'          => $paged,
+	'meta_key'       => '_emp_event_date',
+	'orderby'        => 'meta_value',
+	'order'          => 'ASC',
 ];
 
-if (!empty($meta_query)) $args['meta_query'] = $meta_query;
-if (!empty($tax_query))  $args['tax_query']  = $tax_query;
-
-
-if ($search !== '') {
-    $args['s'] = $search;
+if ( $from || $to ) {
+	$query_args['meta_query'] = [ [
+		'key'     => '_emp_event_date',
+		'compare' => 'BETWEEN',
+		'type'    => 'CHAR',
+		'value'   => [ $from ?: '0000-00-00', $to ?: '9999-12-31' ],
+	] ];
 }
 
-$query = new WP_Query($args);
+if ( $selected_type ) {
+	$query_args['tax_query'] = [ [
+		'taxonomy' => 'event_type',
+		'field'    => 'slug',
+		'terms'    => [ $selected_type ],
+	] ];
+}
 
+if ( $search ) $query_args['s'] = $search;
+
+$query        = new WP_Query( $query_args );
+$active_count = (int) (bool) $selected_type + (int) (bool) $from + (int) (bool) $to + (int) (bool) $search;
+$archive_url  = get_post_type_archive_link( 'event' );
+$type_terms   = get_terms( [ 'taxonomy' => 'event_type', 'hide_empty' => false ] );
+$title        = post_type_archive_title( '', false ) ?: wp_strip_all_tags( get_the_archive_title() );
 ?>
-<main class="emp-wrap emp-archive">
-   <header class="emp-archive-header emp-hero">
-  <div class="emp-hero-inner">
-    <h1 class="emp-title">
-      <?php
- 
-      $title = post_type_archive_title('', false);
+<main class="emp-wrap emp-archive" id="main">
 
- 
-      if (!$title) {
-          $title = wp_strip_all_tags(get_the_archive_title());
-      }
+	<header class="emp-archive-header emp-hero">
+		<div class="emp-hero-inner">
+			<h1 class="emp-title"><?php echo esc_html( $title ); ?></h1>
+			<p class="emp-subtitle"><?php esc_html_e( 'Upcoming and published events', 'event-manager-pro' ); ?></p>
+		</div>
+	</header>
 
-      echo esc_html($title);
-      ?>
-    </h1>
+	<form class="emp-filters emp-filters--pro" method="get" action="<?php echo esc_url( $archive_url ); ?>">
+		<div class="emp-filter-grid">
 
-    <p class="emp-subtitle"><?php echo esc_html__('Upcoming and published events', 'event-manager-pro'); ?></p>
-  </div>
-</header>
-<form class="emp-filters emp-filters--pro"
-      method="get"
-      action="<?php echo esc_url(get_post_type_archive_link('event')); ?>">
+			<label class="emp-field">
+				<span class="emp-label"><?php esc_html_e( 'Type', 'event-manager-pro' ); ?></span>
+				<select name="event_type" class="emp-control">
+					<option value=""><?php esc_html_e( 'All Types', 'event-manager-pro' ); ?></option>
+					<?php foreach ( (array) $type_terms as $term ) :
+						if ( is_wp_error( $term ) ) continue; ?>
+						<option value="<?php echo esc_attr( $term->slug ); ?>"<?php selected( $selected_type, $term->slug ); ?>><?php echo esc_html( $term->name ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</label>
 
-  <div class="emp-filter-grid">
+			<label class="emp-field">
+				<span class="emp-label"><?php esc_html_e( 'From', 'event-manager-pro' ); ?></span>
+				<input class="emp-control" type="date" name="from" value="<?php echo esc_attr( $from ); ?>">
+			</label>
 
-    <!-- TYPE -->
-    <label class="emp-field">
-      <span class="emp-label"><?php _e('Type','event-manager-pro'); ?></span>
-      <select name="event_type" class="emp-control">
-        <option value=""><?php _e('All Types','event-manager-pro'); ?></option>
+			<label class="emp-field">
+				<span class="emp-label"><?php esc_html_e( 'To', 'event-manager-pro' ); ?></span>
+				<input class="emp-control" type="date" name="to" value="<?php echo esc_attr( $to ); ?>">
+			</label>
 
-        <?php
-        $terms = get_terms([
-          'taxonomy'=>'event_type',
-          'hide_empty'=>false
-        ]);
+			<label class="emp-field">
+				<span class="emp-label"><?php esc_html_e( 'Search', 'event-manager-pro' ); ?></span>
+				<input class="emp-control" type="search" name="emp_s"
+				      
+				       value="<?php echo esc_attr( $search ); ?>">
+			</label>
 
-        foreach($terms as $t){
-          printf(
-            '<option value="%s" %s>%s</option>',
-            esc_attr($t->slug),
-            selected($selected_type,$t->slug,false),
-            esc_html($t->name)
-          );
-        }
-        ?>
-      </select>
-    </label>
+			<div class="emp-field emp-field-actions">
+				<button class="emp-btn emp-btn--primary emp-btn--filter" type="submit">
+					<?php esc_html_e( 'Search', 'event-manager-pro' ); ?>
+					<?php if ( $active_count ) : ?><span class="emp-badge"><?php echo absint( $active_count ); ?></span><?php endif; ?>
+				</button>
+				<?php if ( $active_count ) : ?>
+					<a class="emp-btn emp-btn--ghost emp-btn--filter" href="<?php echo esc_url( $archive_url ); ?>">
+						<?php esc_html_e( 'Reset', 'event-manager-pro' ); ?>
+					</a>
+				<?php endif; ?>
+			</div>
 
-    <!-- FROM -->
-    <label class="emp-field">
-      <span class="emp-label"><?php _e('From','event-manager-pro'); ?></span>
-      <input class="emp-control" type="date"
-             name="from"
-             value="<?php echo esc_attr($from); ?>">
-    </label>
+		</div>
+	</form>
 
-    <!-- TO -->
-    <label class="emp-field">
-      <span class="emp-label"><?php _e('To','event-manager-pro'); ?></span>
-      <input class="emp-control" type="date"
-             name="to"
-             value="<?php echo esc_attr($to); ?>">
-    </label>
+	<?php if ( $query->have_posts() ) : ?>
 
-    <!-- SEARCH -->
-    <label class="emp-field">
-      <span class="emp-label"><?php _e('Search','event-manager-pro'); ?></span>
-      <input class="emp-control"
-             type="search"
-             name="s"
-             value="<?php echo esc_attr($search); ?>"
-            >
-    </label>
+		<div class="emp-grid">
+		<?php while ( $query->have_posts() ) : $query->the_post();
 
-    <!-- BUTTON AREA -->
-    <div class="emp-field emp-field-actions">
+			$event_date  = get_post_meta( get_the_ID(), '_emp_event_date', true );
+			$location    = get_post_meta( get_the_ID(), '_emp_location', true );
+			$card_terms  = get_the_terms( get_the_ID(), 'event_type' );
+			$type_label  = ( $card_terms && ! is_wp_error( $card_terms ) ) ? $card_terms[0]->name : '';
+			$badge_date  = '';
+			$nice_date   = '';
 
-      <button class="emp-btn emp-btn--primary emp-btn--filter"
-              type="submit">
-              <?php echo esc_html__('Search', 'event-manager-pro'); ?>
-      </button>
+			if ( $event_date && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $event_date ) ) {
+				$ts = strtotime( $event_date );
+				if ( $ts ) {
+					$badge_date = date_i18n( 'd M', $ts );
+					$nice_date  = date_i18n( get_option( 'date_format' ), $ts );
+				}
+			}
+		?>
+			<article id="post-<?php the_ID(); ?>" <?php post_class( 'emp-card' ); ?>>
 
-      <?php if ($selected_type || $from || $to || $search) : ?>
-        <a class="emp-btn emp-btn--ghost"
-           href="<?php echo esc_url(get_post_type_archive_link('event')); ?>">
-           <?php echo esc_html__('Reset', 'event-manager-pro'); ?>
-        </a>
-      <?php endif; ?>
+				<a class="emp-card-media" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true">
+					<?php if ( has_post_thumbnail() ) :
+						the_post_thumbnail( 'large', [ 'loading' => 'lazy', 'decoding' => 'async' ] );
+					else : ?>
+						<span class="emp-card-media--placeholder"></span>
+					<?php endif; ?>
+					<?php if ( $badge_date ) : ?>
+						<span class="emp-date-badge" aria-hidden="true"><?php echo esc_html( $badge_date ); ?></span>
+					<?php endif; ?>
+				</a>
 
-    </div>
+				<div class="emp-card-body">
 
-  </div>
-</form>
+					<?php if ( $type_label || $location || $nice_date ) : ?>
+						<div class="emp-meta">
+							<?php if ( $type_label ) : ?>
+								<span class="emp-pill emp-pill--type"><?php echo esc_html( $type_label ); ?></span>
+							<?php endif; ?>
+							<?php if ( $location ) : ?>
+								<span class="emp-pill">
+									<svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden="true"><path d="M5.5 0C3.015 0 1 2.015 1 4.5c0 3.375 4.5 8.5 4.5 8.5S10 7.875 10 4.5C10 2.015 7.985 0 5.5 0Zm0 6.125A1.625 1.625 0 1 1 5.5 2.875a1.625 1.625 0 0 1 0 3.25Z" fill="currentColor"/></svg>
+									<?php echo esc_html( $location ); ?>
+								</span>
+							<?php endif; ?>
+							<?php if ( $nice_date ) : ?>
+								<span class="emp-pill">
+									<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="1" y="2" width="10" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M1 5h10M4 1v2M8 1v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+									<?php echo esc_html( $nice_date ); ?>
+								</span>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
 
-    <?php if ( $query->have_posts() ) : ?>
-        <div class="emp-grid">
-            <?php while ( $query->have_posts() ) : $query->the_post();
-  $event_date = get_post_meta(get_the_ID(), '_emp_event_date', true);
-  $location   = get_post_meta(get_the_ID(), '_emp_location', true);
+					<h2 class="emp-card-title">
+						<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+					</h2>
 
-  // Nice date format (if valid)
-  $nice_date = $event_date;
-  if ($event_date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $event_date)) {
-      $ts = strtotime($event_date);
-      if ($ts) {
-          $nice_date = date_i18n(get_option('date_format'), $ts);
-      }
-  }
+					<div class="emp-excerpt">
+						<?php echo esc_html( wp_trim_words( get_the_excerpt(), 20, '…' ) ); ?>
+					</div>
 
-  // Event type term (first one)
-  $type_label = '';
-  $type_terms = get_the_terms(get_the_ID(), 'event_type');
-  if (!empty($type_terms) && !is_wp_error($type_terms)) {
-      $type_label = $type_terms[0]->name;
-  }
-?>
- <article class="emp-card">
-  <a class="emp-card-media" href="<?php the_permalink(); ?>">
-    <?php if (has_post_thumbnail()) : ?>
-      <?php the_post_thumbnail('large'); ?>
-    <?php else : ?>
-      <span class="emp-card-media--placeholder"></span>
-    <?php endif; ?>
+					<a class="emp-btn emp-btn--primary emp-btn--sm" href="<?php the_permalink(); ?>">
+						<?php esc_html_e( 'View Event', 'event-manager-pro' ); ?>
+						<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6h8M6.5 3l3.5 3-3.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</a>
 
-    <?php
-      $event_date = get_post_meta(get_the_ID(), '_emp_event_date', true);
-      $nice_date  = $event_date;
+				</div>
+			</article>
+		<?php endwhile;
+		wp_reset_postdata(); ?>
+		</div>
 
-      if ($event_date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $event_date)) {
-          $ts = strtotime($event_date);
-          if ($ts) $nice_date = date_i18n('d M', $ts); // ör: 12 Mar
-      }
-    ?>
-    <?php if (!empty($nice_date)) : ?>
-      <span class="emp-date-badge"><?php echo esc_html($nice_date); ?></span>
-    <?php endif; ?>
-  </a>
+		<nav class="emp-pagination" aria-label="<?php esc_attr_e( 'Events pagination', 'event-manager-pro' ); ?>">
+			<?php echo paginate_links( [
+				'total'     => $query->max_num_pages,
+				'current'   => $paged,
+				'prev_text' => '&lsaquo;',
+				'next_text' => '&rsaquo;',
+			] ); ?>
+		</nav>
 
-  <div class="emp-card-body">
-    <h2 class="emp-card-title">
-      <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-    </h2>
+	<?php else : ?>
 
-    <div class="emp-meta">
-      <?php
-      $location = get_post_meta(get_the_ID(), '_emp_location', true);
-      if ($location) : ?>
-        <span class="emp-pill"><?php echo esc_html($location); ?></span>
-      <?php endif; ?>
-    </div>
+		<div class="emp-empty">
+			<svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M14 20h12M20 14v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+			<p><?php esc_html_e( 'No events found.', 'event-manager-pro' ); ?></p>
+			<?php if ( $active_count ) : ?>
+				<a class="emp-btn emp-btn--ghost" href="<?php echo esc_url( $archive_url ); ?>">
+					<?php esc_html_e( 'Clear filters', 'event-manager-pro' ); ?>
+				</a>
+			<?php endif; ?>
+		</div>
 
-    <div class="emp-excerpt">
-      <?php
-      $excerpt = get_the_excerpt();
-      echo esc_html( wp_trim_words($excerpt, 150, '…') );
-      ?>
-    </div>
+	<?php endif; ?>
 
-    <a class="emp-btn emp-btn--primary" href="<?php the_permalink(); ?>">
-      <?php echo esc_html__('View Event', 'event-manager-pro'); ?>
-    </a>
-  </div>
-</article>
-<?php endwhile; ?>
-        </div>
-
-        <div class="emp-pagination">
-            <?php
-            echo paginate_links([
-                'total'   => $query->max_num_pages,
-                'current' => $paged,
-            ]);
-            ?>
-        </div>
-    <?php else : ?>
-        <p><?php echo esc_html__('No events found.', 'event-manager-pro'); ?></p>
-    <?php endif; ?>
 </main>
 <?php
-
-$html = ob_get_clean();
-echo $html;
-
-// 5 minutes cache 
-EMP_Cache::set($cache_key, $html, 300);
+EMP_Cache::set( $cache_key, ob_get_flush(), 300 );
 get_footer();

@@ -21,6 +21,9 @@ msgstr "Ali Vahap Aydın"
 msgid "Event Date"
 msgstr "Etkinlik Tarihi"
 
+msgid "Date"
+msgstr "Tarih"
+
 msgid "Location"
 msgstr "Konum"
 
@@ -38,6 +41,9 @@ msgstr "örn. İstanbul"
 
 msgid "No events found."
 msgstr "Etkinlik bulunamadı."
+
+msgid "No events found"
+msgstr "Etkinlik bulunamadı"
 
 msgid "New Event Published: %s"
 msgstr "Yeni Etkinlik Yayınlandı: %s"
@@ -74,11 +80,6 @@ msgstr "Yeni Etkinlik"
 
 msgid "View Event"
 msgstr "Etkinliği Görüntüle"
-
-
-
-msgid "No events found"
-msgstr "Etkinlik bulunamadı"
 
 msgid "No events found in Trash"
 msgstr "Çöp kutusunda etkinlik bulunamadı"
@@ -155,6 +156,15 @@ msgstr "Filtrele"
 msgid "Reset"
 msgstr "Sıfırla"
 
+msgid "Clear filters"
+msgstr "Filtreleri temizle"
+
+msgid "Event name or location…"
+msgstr "Etkinlik adı veya konum…"
+
+msgid "Events pagination"
+msgstr "Etkinlik sayfalaması"
+
 msgid "Register for this event"
 msgstr "Bu etkinliğe kayıt ol"
 
@@ -170,5 +180,20 @@ msgstr "Kayıt Ol"
 msgid "Search events"
 msgstr "Etkinliklerde ara…"
 
-msgid "Reset"
-msgstr "Sıfırla"
+msgid "Home"
+msgstr "Ana Sayfa"
+
+msgid "Breadcrumb"
+msgstr "Konum izi"
+
+msgid "Event registration"
+msgstr "Etkinlik kaydı"
+
+msgid "Join this event"
+msgstr "Bu etkinliğe katıl"
+
+msgid "Your full name"
+msgstr "Adınız ve soyadınız"
+
+msgid "your@email.com"
+msgstr "siz@eposta.com"
